@@ -385,7 +385,11 @@
                 </div>
             </div>
             <template slot="footer">
+<<<<<<< HEAD
                 <div class="bk-dialog-outer" v-if="!delMesosNamespaceDialogConf.list.length">
+=======
+                <div class="bk-dialog-outer">
+>>>>>>> ab94882... mesos 删除命名空间
                     <button type="button" class="bk-dialog-btn bk-dialog-btn-confirm bk-btn-primary"
                         @click="delMesosNamespaceConfirm">
                         {{$t('删除')}}
@@ -394,7 +398,10 @@
                         {{$t('取消')}}
                     </button>
                 </div>
+<<<<<<< HEAD
                 <div class="bk-dialog-outer" v-else></div>
+=======
+>>>>>>> ab94882... mesos 删除命名空间
             </template>
         </bk-dialog>
     </div>
@@ -477,11 +484,18 @@
                     isShow: false,
                     width: 650,
                     title: '',
+<<<<<<< HEAD
                     closeIcon: true,
                     ns: {},
                     loading: false,
                     list: [],
                     hasFooter: false
+=======
+                    closeIcon: false,
+                    ns: {},
+                    loading: false,
+                    list: []
+>>>>>>> ab94882... mesos 删除命名空间
                 }
             }
         },
@@ -1074,7 +1088,10 @@
                         }
                     })
                     this.delMesosNamespaceDialogConf.list.splice(0, this.delMesosNamespaceDialogConf.list.length, ...list)
+<<<<<<< HEAD
                     this.delMesosNamespaceDialogConf.hasFooter = !this.delMesosNamespaceDialogConf.list.length
+=======
+>>>>>>> ab94882... mesos 删除命名空间
 
                     setTimeout(() => {
                         this.delMesosNamespaceDialogConf.loading = false
@@ -1163,7 +1180,10 @@
                 setTimeout(() => {
                     this.delMesosNamespaceDialogConf.ns = Object.assign({}, {})
                     this.delMesosNamespaceDialogConf.list.splice(0, this.delMesosNamespaceDialogConf.list.length, ...[])
+<<<<<<< HEAD
                     this.delMesosNamespaceDialogConf.hasFooter = false
+=======
+>>>>>>> ab94882... mesos 删除命名空间
                 }, 300)
             },
 
