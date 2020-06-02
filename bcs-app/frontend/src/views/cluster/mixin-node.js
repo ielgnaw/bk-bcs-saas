@@ -533,7 +533,6 @@ export default {
          * @param {number} index 当前节点索引
          */
         async getNodeSummary (cur, index) {
-            const kind = this.curProject.kind
             try {
                 // const res = kind !== 2
                 //     ? await this.$store.dispatch('cluster/getNodeOverview', {
