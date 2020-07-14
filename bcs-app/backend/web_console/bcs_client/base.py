@@ -13,6 +13,8 @@
 #
 import abc
 import logging
+import shlex
+from urllib.parse import urlencode
 
 import arrow
 from django.utils.encoding import smart_text
@@ -68,6 +70,15 @@ class BCSClientBase(abc.ABC):
         self.output_record = []
         return record
 
+    def close_transmission(self):
+        """结束通讯, 发送CTRL-D
+        ASCII编码 EOT 04
+        """
+        try:
+            self.write_message(chr(4))
+        except Exception as error:
+            logger.warning("close_transmission %s error: %s", self.msg_handler.user_pod_name, error)
+
     def handle_message(self, message):
         """消息格式转换
         """
@@ -77,6 +88,16 @@ class BCSClientBase(abc.ABC):
         """写入消息
         """
         self.ws.write_message(message)
+
+    @classmethod
+    def get_command_params(cls, context):
+        """获取k8s标准的命令参数
+        """
+        command = context.get("command") or "sh"
+        command_list = shlex.split(command)
+        command_list = [("command", i) for i in command_list]
+        command = urlencode(command_list)
+        return command
 
     @abc.abstractmethod
     def set_pty_size(self, rows: int, cols: int):

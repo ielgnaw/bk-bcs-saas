@@ -6,6 +6,7 @@
             :placeholder="placeholder"
             class="bk-form-input"
             autocomplete="off"
+            ref="inputer"
             v-bk-focus="autoFocus"
             :value="curValue"
             @focus="focusHandler"
@@ -284,6 +285,7 @@
                         } else {
                             this.$emit('blur', event)
                         }
+                        this.$emit('enter', event)
                         break
                 }
             },
@@ -706,6 +708,9 @@
 
                     this.panelStyle = { ...ySet, minWidth: '235px' }
                 }
+            },
+            focus () {
+                this.$refs.inputer.focus()
             }
         }
     }

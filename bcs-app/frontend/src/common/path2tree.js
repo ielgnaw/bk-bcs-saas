@@ -27,26 +27,29 @@ function path2tree (arr, conf) {
 
         for (let i = 0; i < splitpath.length; i++) {
             const node = {
+                openedIcon: 'icon-folder-open',
+                closedIcon: 'icon-folder',
+                icon: 'icon-folder',
                 name: splitpath[i],
                 title: splitpath[i],
                 expanded: false,
                 children: []
             }
 
-            // 第一级目录展开
-            if (conf.expandIndex !== undefined && i === conf.expandIndex) {
+            // 将第一个目录节点下的所有层级展开
+            if (index === 0) {
                 node.expanded = true
             }
 
             // 找到最后一个节点，设置为叶子，并带上value属性
             if (i === splitpath.length - 1) {
                 delete node.children
-                delete node.openedIcon
-                delete node.closedIcon
                 
                 if (obj.value) {
                     node.value = obj.value
                     node.icon = 'icon-file'
+                    delete node.openedIcon
+                    delete node.closedIcon
                 }
 
                 // default 选中第一个文件
@@ -62,10 +65,14 @@ function path2tree (arr, conf) {
                     if (child.name === node.name) {
                         if (i === splitpath.length - 1) {
                             delete node.children
-                            delete node.openedIcon
-                            delete node.closedIcon
-                            node.value = obj.value
-                            node.selected = true
+
+                            if (obj.value) {
+                                node.value = obj.value
+                                node.selected = true
+                                node.icon = 'icon-file'
+                                delete node.openedIcon
+                                delete node.closedIcon
+                            }
                         } else {
                             ptr = child
                         }
@@ -85,6 +92,7 @@ function path2tree (arr, conf) {
     arr.forEach((item, index) => {
         addNode(item, index)
     })
+
     return tree
 }
 
