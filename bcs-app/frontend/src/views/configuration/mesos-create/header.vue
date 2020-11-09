@@ -1428,7 +1428,7 @@
                     }
 
                     if (!nameReg1.test(container.name)) {
-                        megPrefix += `$t('容器名称')：`
+                        megPrefix += `${this.$t('容器名称')}：`
                         this.$bkMessage({
                             theme: 'error',
                             message: megPrefix + this.$t('名称错误，只能包含：小写字母、数字、连字符(-)，必须是字母开头，长度小于64个字符'),
@@ -2888,7 +2888,16 @@
                             type: item.type,
                             content: item.content
                         }
+                        if (item.type === 'http' && item.auth && item.auth.split(':').length >= 2) {
+                            const remoteUser = item.auth.split(':')[0]
+                            const remotePassword = item.auth.replace(remoteUser + ':', '').trim()
+                            if (remoteUser && remotePassword) {
+                                keyObj[item.key].remoteUser = remoteUser
+                                keyObj[item.key].remotePassword = remotePassword
+                            }
+                        }
                     })
+
                     params.config.datas = keyObj
                     configmap.config.datas = keyObj
                 }
@@ -2897,6 +2906,8 @@
                     name: this.curTemplate.name,
                     desc: this.curTemplate.desc
                 }
+
+                delete params.configmapKeyList
                 return params
             },
             async saveConfigmap (configmap) {

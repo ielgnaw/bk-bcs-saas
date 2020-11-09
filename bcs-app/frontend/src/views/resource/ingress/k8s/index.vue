@@ -106,7 +106,7 @@
                                                 <bk-tooltip :content="ingress.can_update_msg" v-else placement="left">
                                                     <a href="javascript:void(0);" class="bk-text-button is-disabled">{{$t('更新')}}</a>
                                                 </bk-tooltip>
-                                                <a v-if="ingress.can_delete" @click.stop="removeIngress(ingress)" class="bk-text-button">{{$t('删除')}}</a>
+                                                <a v-if="ingress.can_delete" @click.stop="removeIngress(ingress)" class="bk-text-button ml10">{{$t('删除')}}</a>
                                                 <bk-tooltip :content="ingress.can_delete_msg || $t('不可删除')" v-else placement="left">
                                                     <span class="bk-text-button is-disabled ml10">{{$t('删除')}}</span>
                                                 </bk-tooltip>
@@ -1126,7 +1126,7 @@
 
                     for (const path of paths) {
                         if (!path.path) {
-                            megPrefix += this.$t('路径组：')
+                            megPrefix += `${rule.host}中${this.$t('路径组')}：`
                             this.$bkMessage({
                                 theme: 'error',
                                 message: megPrefix + this.$t('请填写路径！'),
@@ -1136,7 +1136,7 @@
                         }
 
                         if (path.path && !pathReg.test(path.path)) {
-                            megPrefix += `${this.$t('路径组')}：`
+                            megPrefix += `${rule.host}中${this.$t('路径组')}：`
                             this.$bkMessage({
                                 theme: 'error',
                                 message: megPrefix + this.$t('路径不正确'),
@@ -1146,7 +1146,7 @@
                         }
 
                         if (!path.backend.serviceName) {
-                            megPrefix += this.$t('路径组：')
+                            megPrefix += `${rule.host}中${this.$t('路径组')}：`
                             this.$bkMessage({
                                 theme: 'error',
                                 message: megPrefix + this.$t('请关联服务！'),
@@ -1156,7 +1156,7 @@
                         }
 
                         if (!path.backend.servicePort) {
-                            megPrefix += this.$t('路径组：')
+                            megPrefix += `${rule.host}中${this.$t('路径组')}：`
                             this.$bkMessage({
                                 theme: 'error',
                                 message: megPrefix + this.$t('请关联服务端口！'),
@@ -1166,7 +1166,7 @@
                         }
 
                         if (path.backend.serviceName && !this.linkServices.hasOwnProperty(path.backend.serviceName)) {
-                            megPrefix += this.$t('路径组：')
+                            megPrefix += `${rule.host}中${this.$t('路径组')}：`
                             this.$bkMessage({
                                 theme: 'error',
                                 message: megPrefix + `关联的Service【${path.backend.serviceName}】不存在，请重新绑定！`,

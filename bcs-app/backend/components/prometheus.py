@@ -40,7 +40,7 @@ def query_range(query, start, end, step, project_id=None):
     data = {"query": query, "start": start, "end": end, "step": step}
     headers = {"X-Tenant-Project-Id": project_id}
     logger.info("prometheus query_range: %s", data)
-    resp = http_post(url, data=data, timeout=120, auth=AUTH, headers=headers, raise_for_status=False)
+    resp = http_post(url, data=data, timeout=120, auth=AUTH, headers=headers, raise_exception=False)
     return resp
 
 
@@ -51,7 +51,7 @@ def query(_query, time=None, project_id=None):
     data = {"query": _query, "time": time}
     headers = {"X-Tenant-Project-Id": project_id}
     logger.info("prometheus query: %s", data)
-    resp = http_post(url, data=data, timeout=120, auth=AUTH, headers=headers, raise_for_status=False)
+    resp = http_post(url, data=data, timeout=120, auth=AUTH, headers=headers, raise_exception=False)
     return resp
 
 
@@ -62,7 +62,7 @@ def get_series(match, start, end, project_id=None):
     headers = {"X-Tenant-Project-Id": project_id}
     data = {"match[]": match, "start": start, "end": end}
     logger.info("prometheus series: %s", data)
-    resp = http_post(url, data=data, timeout=120, auth=AUTH, headers=headers, raise_for_status=False)
+    resp = http_post(url, data=data, timeout=120, auth=AUTH, headers=headers, raise_exception=False)
     return resp
 
 
@@ -595,3 +595,51 @@ def mesos_cluster_memory_usage(cluster_id, node_list):
         name = metric["metric"].get("metric_name")
         data[name] = metric["value"][1]
     return data
+
+
+def mesos_cluster_cpu_resource_remain_range(cluster_id, start, end):
+    """mesos集群CPU剩余量, 单位核
+    """
+    step = (end - start) // 60
+    prom_query = f"""
+        max by (cluster_id) (bkbcs_scheduler_cluster_cpu_resource_remain{{cluster_id="{cluster_id}"}})
+    """  # noqa
+
+    resp = query_range(prom_query, start, end, step)
+    return resp.get("data") or {}
+
+
+def mesos_cluster_cpu_resource_total_range(cluster_id, start, end):
+    """mesos集群CPU总量, 单位核
+    """
+    step = (end - start) // 60
+    prom_query = f"""
+        max by (cluster_id) (bkbcs_scheduler_cluster_cpu_resource_total{{cluster_id="{cluster_id}"}})
+    """  # noqa
+
+    resp = query_range(prom_query, start, end, step)
+    return resp.get("data") or {}
+
+
+def mesos_cluster_memory_resource_remain_range(cluster_id, start, end):
+    """mesos集群内存剩余量, 单位MB
+    """
+    step = (end - start) // 60
+    prom_query = f"""
+        max by (cluster_id) (bkbcs_scheduler_cluster_memory_resource_remain{{cluster_id="{cluster_id}"}})
+    """  # noqa
+
+    resp = query_range(prom_query, start, end, step)
+    return resp.get("data") or {}
+
+
+def mesos_cluster_memory_resource_total_range(cluster_id, start, end):
+    """mesos集群内存总量, 单位MB
+    """
+    step = (end - start) // 60
+    prom_query = f"""
+       max by (cluster_id) (bkbcs_scheduler_cluster_memory_resource_total{{cluster_id="{cluster_id}"}})
+    """  # noqa
+
+    resp = query_range(prom_query, start, end, step)
+    return resp.get("data") or {}

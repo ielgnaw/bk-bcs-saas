@@ -42,7 +42,6 @@ from backend.apps.cluster import serializers as node_serializers
 from backend.utils.renderers import BKAPIRenderer
 from backend.apps.cluster.views_bk import node
 from backend.apps.cluster.views_bk.tools import cmdb, gse
-from backend.apps.cluster.views.utils import get_error_msg
 from backend.resources.cluster.utils import get_cluster_nodes
 
 logger = logging.getLogger(__name__)
@@ -227,12 +226,14 @@ class NodeCreateListViewSet(NodeBase, NodeHandler, viewsets.ViewSet):
 
     def add_container_count(self, request, project_id, cluster_id, project_kind, node_list):
         host_ip_list = [info['inner_ip'] for info in node_list]
-        driver = BaseDriver(project_kind).driver(request, project_id, cluster_id)
-        host_container_map = driver.get_host_container_count(host_ip_list)
+        try:
+            driver = BaseDriver(project_kind).driver(request, project_id, cluster_id)
+            host_container_map = driver.get_host_container_count(host_ip_list)
+        except Exception as e:
+            logger.exception(f"通过BCS API查询主机container数量异常, 详情: {e}")
+            host_container_map = {}
         for info in node_list:
-            info['containers'] = 0
-            if info['inner_ip'] in host_container_map:
-                info['containers'] = host_container_map[info['inner_ip']]
+            info["containers"] = host_container_map.get(info["inner_ip"], 0)
         return node_list
 
     def compose_data_with_containers(self, request, project_id, cluster_id, with_containers, data):
@@ -610,10 +611,7 @@ class NodeUpdateLogView(NodeBase, viewsets.ModelViewSet):
             info.status = self.get_display_status(info.status)
             slz = node_serializers.NodeInstallLogSLZ(instance=info)
             data['log'].append(slz.data)
-        # 异常时，展示错误消息
-        if status == "failed":
-            node_ip = self.get_node_ip(request.user.token.access_token, project_id, cluster_id, node_id)
-            data["error_msg_list"] = get_error_msg(cluster_id, node_ip=node_ip)
+
         return data
 
     def get(self, request, project_id, cluster_id, node_id):
@@ -1290,7 +1288,6 @@ class BatchUpdateDeleteNodeViewSet(NodeGetUpdateDeleteViewSet):
             resource_id=','.join(id_list)[:200],
             description=log_desc
         ).log_delete():
-            self.update_nodes_in_cluster(request, project_id, cluster_id, ip_list, NodeStatus.Removing)
             cluster_utils.delete_node_labels_record(NodeLabel, id_list, request.user.username)
             node_client = node.BatchDeleteNode(request, project_id, cluster_id, node_list)
             node_client.delete_nodes()

@@ -1140,6 +1140,12 @@
     max-width: 220px;
 }
 
+.biz-scroll-tab {
+    &.bk-tab2 .bk-tab2-head .bk-tab2-nav>.tab2-nav-item {
+        width: 180px;
+    }
+}
+
 .english {
     .bk-form .bk-label {
         position: absolute;
@@ -1209,4 +1215,17 @@
     .bk-dialog-tool {
         display: none;
     }
+}
+
+.bk-form-inline-item.is-required .bk-label:after,
+.bk-form-item.is-required .bk-label:after {
+    top: 0;
+    margin-top: 12px;
+}
+.v-tooltips-container .v-tooltips-content {
+    max-width: 500px;
+}
+.bk-selector .bk-selector-node .text {
+    height: 42px;
+    line-height: 42px;
 }
