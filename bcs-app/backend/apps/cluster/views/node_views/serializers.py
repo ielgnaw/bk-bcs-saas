@@ -11,34 +11,22 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 #
-from backend.utils.func_controller import get_func_controller
+from rest_framework import serializers
 
 
-def enabled_hpa_feature(cluster_id_list: list) -> bool:
-    """HPA按集群做白名单控制
-    """
-    return True
+class LabelsItemSLZ(serializers.Serializer):
+    cluster_id = serializers.CharField()
+    inner_ip = serializers.CharField()
+    labels = serializers.JSONField(default=[])
 
 
-def enabled_sync_namespace(project_id: str) -> bool:
-    """是否允许非导航【命名空间】页面创建的命名空间数据
-    """
-    return True
+class NodeLabelsSLZ(serializers.Serializer):
+    node_labels = serializers.ListField(child=LabelsItemSLZ())
 
 
-def enabled_force_sync_chart_repo(project_id: str) -> bool:
-    """是否允许强制同步仓库数据
-    """
-    return False
+class FilterNodeLabelsSLZ(NodeLabelsSLZ):
+    pass
 
 
-def enable_helm_v3(cluster_id: str) -> bool:
-    """是否允许集群使用helm3功能
-    """
-    return True
-
-
-def enable_incremental_sync_chart_repo(project_id: str) -> bool:
-    """是否开启增量同步仓库数据
-    """
-    return False
+class SetNodeLabelsSLZ(NodeLabelsSLZ):
+    pass

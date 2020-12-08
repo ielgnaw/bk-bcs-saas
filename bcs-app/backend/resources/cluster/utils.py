@@ -20,6 +20,7 @@ from backend.utils.errcodes import ErrorCode
 from backend.utils.error_codes import error_codes
 from backend.utils.decorators import parse_response_data
 from backend.utils.cache import region
+from backend.components.bcs import k8s, mesos
 
 
 def get_clusters(access_token, project_id):
@@ -113,3 +114,57 @@ def get_cluster_coes(access_token, project_id, cluster_id):
 @parse_response_data()
 def delete_cluster(access_token, project_id, cluster_id):
     return paas_cc.delete_cluster(access_token, project_id, cluster_id)
+
+
+def get_cc_zk_config(access_token, project_id, cluster_id):
+    resp = paas_cc.get_zk_config(access_token, project_id, cluster_id)
+    if resp.get("code") != ErrorCode.NoError:
+        raise error_codes.APIError(_("通过cc获取zk信息出错，{}").format(resp.get("message")))
+    data = resp.get("data")
+    if not data:
+        raise error_codes.APIError(_("通过cc获取zk信息为空"))
+    return data[0]
+
+
+def get_cc_repo_domain(access_token, project_id, cluster_id):
+    return paas_cc.get_jfrog_domain(access_token, project_id, cluster_id)
+
+
+@parse_response_data()
+def create_or_update_agent_labels(access_token, project_id, cluster_id, labels):
+    client = mesos.MesosClient(access_token, project_id, cluster_id, None)
+    return client.update_agent_attrs(labels)
+
+
+def query_mesos_node_labels(access_token, project_id, cluster_nodes):
+    # 需要支持跨集群操作
+    # cluster_nodes格式: {"cluster-id1": ["ip1", "ip2"], "cluster-id2": ["ip3", "ip4"]]
+    node_labels = {cluster_id: {} for cluster_id in cluster_nodes}
+    for cluster_id, node_ips in cluster_nodes.items():
+        client = mesos.MesosClient(access_token, project_id, cluster_id, None)
+        # 现阶段查询标签仅接口仅支持get请求，而get请求有长度限制，因此，先查询集群下的所有节点的属性，然后通过inner_ip进行匹配
+        data = client.get_agent_attrs()
+        ip_labels_map = {
+            node["innerIP"]: [{key: val["value"]} for key, val in (node.get("strings") or {}).items()]
+            for node in data
+        }
+        for ip in node_ips:
+            node_labels[cluster_id][ip] = ip_labels_map.get(ip) or []
+        # 当过滤的IP为空时，返回整个集群的节点标签
+        if not node_ips:
+            node_labels[cluster_id] = ip_labels_map
+
+    return node_labels
+
+
+def set_mesos_node_labels(access_token, project_id, labels):
+    # labels格式: {"cluster_id": [{"inner_ip": ip1, "strings":{key: {"value": val}}}]}
+    for cluster_id, node_labels in labels.items():
+        create_or_update_agent_labels(access_token, project_id, cluster_id, node_labels)
+
+
+@parse_response_data()
+def update_cc_nodes_status(access_token, project_id, cluster_id, nodes):
+    """更新记录的节点状态
+    """
+    return paas_cc.update_node_list(access_token, project_id, cluster_id, data=nodes)

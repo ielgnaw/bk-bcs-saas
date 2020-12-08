@@ -11,34 +11,13 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 #
-from backend.utils.func_controller import get_func_controller
 
+# k8s 中系统的命名空间，不允许用户创建，也不能操作上面的资源 kube-system, kube-public
+K8S_SYS_NAMESPACE = ["kube-system", "kube-public"]
 
-def enabled_hpa_feature(cluster_id_list: list) -> bool:
-    """HPA按集群做白名单控制
-    """
-    return True
+# k8s 平台服务用的命名空间
+# TODO: bcs-system命名空间后续处理
+K8S_PLAT_NAMESPACE = ["web-console", "gitlab-ci", "thanos"]
 
-
-def enabled_sync_namespace(project_id: str) -> bool:
-    """是否允许非导航【命名空间】页面创建的命名空间数据
-    """
-    return True
-
-
-def enabled_force_sync_chart_repo(project_id: str) -> bool:
-    """是否允许强制同步仓库数据
-    """
-    return False
-
-
-def enable_helm_v3(cluster_id: str) -> bool:
-    """是否允许集群使用helm3功能
-    """
-    return True
-
-
-def enable_incremental_sync_chart_repo(project_id: str) -> bool:
-    """是否开启增量同步仓库数据
-    """
-    return False
+# 平台和系统使用的命名空间
+K8S_SYS_PLAT_NAMESPACES = K8S_SYS_NAMESPACE + K8S_PLAT_NAMESPACE
