@@ -11,11 +11,11 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 #
-from django.conf.urls import url
-from . import views
+from backend.resources.custom_object.constants import gamestatefulset_name, gamedeployment_name
+from backend.utils.basic import ChoicesEnum
 
-urlpatterns = [
-    # api
-    url(r'^api/monitor/(?P<project_id>\w{32})/controller_list/$',
-        views.ControllerList.as_view()),
-]
+
+class SupportedScaleCRDs(ChoicesEnum):
+    GameStatefulSet = gamestatefulset_name
+    GameDeployment = gamedeployment_name
+    _choices_labels = ((GameStatefulSet, gamestatefulset_name), (GameDeployment, gamedeployment_name))

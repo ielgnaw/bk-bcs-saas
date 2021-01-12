@@ -11,10 +11,5 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 #
-from __future__ import unicode_literals
-
-from django.apps import AppConfig
-
-
-class AppsConfig(AppConfig):
-    name = 'backend.apps.paas_monitor'
+gamestatefulset_name = "gamestatefulsets.tkex.tencent.com"
+gamedeployment_name = "gamedeployments.tkex.tencent.com"
