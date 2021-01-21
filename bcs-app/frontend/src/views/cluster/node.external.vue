@@ -1010,7 +1010,7 @@
         <tip-dialog
             ref="recordRemoveDialog"
             icon="bk-icon icon-exclamation-triangle"
-            :sub-title="$t('请确认: ') "
+            :has-sub-title="false"
             :show-close="false"
             :check-list="recordRemoveNoticeList"
             :confirm-btn-text="$t('确定')"
